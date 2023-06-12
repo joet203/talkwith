@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bot Configurator</title>
+    <style>
+      body {
+        background-color: #222;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 28px;
+        text-align: center;
+      }
+
+      form {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-top: 10px;
+        font-size: 16px;
+      }
+
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+        border: none;
+        background-color: #444;
+        color: #fff;
+        margin-top: 5px;
+      }
+      textarea {
+        min-height: 30px;
+      }
+      input[type="text"]::placeholder,
+      textarea::placeholder {
+        color: #888;
+      }
+
+      button[type="submit"],
+      button {
+        background-color: #0080ff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      button[type="submit"]:hover,
+      button:hover {
+        background-color: #0059b3;
+      }
+
+      h2 {
+        font-size: 24px;
+        margin-top: 20px;
+      }
+
+      select,
+      option {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+        border: none;
+        background-color: #444;
+        color: #fff;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Bot Configurator</h1>
+
+    <form id="bot-form">
+      <label for="bot-name">Bot Name:</label><br />
+      <input type="text" id="bot-name" name="bot-name" required /><br />
+      <label for="page-title">Page Title:</label><br />
+      <input type="text" id="page-title" name="page-title" required /><br />
+      <label for="init-text">Initialization Text:</label><br />
+      <textarea id="init-text" name="init-text" required>
+Write NAME's next reply in a fictional chat between NAME and You. Write 1 reply only in internet RP style, italicize actions, and avoid quotation marks. Use markdown. Be proactive, creative, and drive the plot and conversation forward. Write at least 1 paragraph, up to 2. Always stay in character and avoid repetition.</textarea
+      ><br />
+      <label for="first-message">First Message:</label><br />
+      <textarea id="first-message" name="first-message" required></textarea
+      ><br />
+      <label for="colorScheme">Color Scheme:</label><br />
+      <input
+        type="text"
+        id="colorScheme"
+        name="colorScheme"
+        placeholder="Enter a valid CSS color"
+      /><br />
+
+      <label for="suggestion-text">Suggestion Text:</label><br />
+      <textarea id="suggestion-text" name="suggestionText"></textarea><br />
+      <button type="submit">Save</button>
+    </form>
+
+    <h2>Load Existing Bot</h2>
+    <select id="bot-selector">
+      <!-- Options will be added dynamically -->
+    </select>
+    <button onclick="loadBotData()">Load</button>
+  </body>
+  <script src="adminscript.js"></script>
+</html>
