@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Chatbot</h1>
+    <div id="chatbox">
+        <p id="botStarterMessage" class="botText"><span>Let's chat!</span></p>
+    </div>
+
+    <div id="userInput">
+        <input id="textInput" class="inputBox" placeholder="Type your message here..." type="text">
+        <button id="buttonInput" class="inputButton" onclick="sendMessage()">Send</button>
+    </div>
+
+<script>
+async function sendMessage() {
+    const messageBox = document.querySelector("#textInput");
+    const message = messageBox.value;
+    messageBox.value = "";
+
+    // Add user message to the chat
+    document.querySelector("#chatbox").innerHTML += `<p class="userText"><span>${message}</span></p>`;
+
+    const response = await fetch('/message', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({"message": message}),
+    });
+    const jsonResponse = await response.json();
+    const botMessage = jsonResponse.reply;
+
+    // Add bot reply to the chat
+    document.querySelector("#chatbox").innerHTML += `<p class="botText"><span>${botMessage}</span></p>`;
+}
+
+</script>
+
+<style>
+/* Add your own styles */
+</style>
+
+</body>
+</html>

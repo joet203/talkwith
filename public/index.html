@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="icon"
+      href="https://cdn.glitch.global/61aa3ea8-a329-4af2-8ab5-6082aabb6c14/favicon.ico?v=1684785894620"
+      type="image/x-icon"
+    />
+    <style>
+      body {
+        --color0: #fff;
+        --color1: #000; // default color
+        --color2: #5d0b74; // default color
+        --color3: #5d1bf4; // default color
+
+        font-family: Arial, sans-serif;
+        background-color: #f2e8cf;
+        margin: 0;
+        padding: 2vw;
+        font-size: 2.5vw;
+        background-color: #e8d8f0; /* Changed to light purple */
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        text-shadow: 1px 0.5px 1px var(--color2);
+        font-size: 3vw;
+      }
+      .small-text {
+        font-size: 0.8em;
+      }
+      #chatbox {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 1vw;
+        padding: 2vw;
+        margin-bottom: 2vw;
+        min-height: 25vh;
+        width: 100%;
+        overflow-y: auto;
+      }
+
+      #cbox {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .botText,
+      .userText {
+        color: var(--color2);
+        font-size: 2.5vw;
+
+        font-weight: bold;
+        font-weight: 500;
+      }
+
+      .userText {
+        color: var(--color3);
+        text-align: right;
+        font-weight: bold;
+        font-weight: 500;
+      }
+
+      .inputBox {
+        width: 100%;
+        padding: 1vw;
+        border: 1px solid #ccc;
+        border-radius: 1vw;
+        font-size: 3vw;
+      }
+
+      .inputButton {
+        padding: 1vw 2vw;
+        background-color: var(--color2);
+        color: #fff;
+        border: none;
+        border-radius: 1vw;
+        font-size: 3vw;
+        cursor: pointer;
+      }
+
+      .inputButton:hover {
+        background-color: var(--color3);
+      }
+
+      #userInputSuggestions,
+      #userInput {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .loadingIndicator {
+        margin-top: 1vw;
+        width: 4vw;
+        height: 4vw;
+        border-radius: 50%;
+        border: 4px solid #ccc;
+        border-top-color: var(--color2);
+        animation: spin 2s infinite linear;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .errorText {
+        color: #bc4749;
+        font-weight: bold;
+        font-size: 2vw;
+      }
+      .botText {
+        cursor: pointer;
+        font-size: 3vw;
+      }
+
+      .botText:hover {
+        background-color: #fbfdfc;
+      }
+
+      .copied {
+        background-color: #d4edda !important;
+      }
+
+      #suggestionsContainer {
+        margin-top: 0vw;
+        text-align: center;
+      }
+
+      .suggestion {
+        background-color: #f5f5f5;
+        border: none;
+        border-radius: 2vw;
+        padding: 0.5vw 0.5vw;
+        cursor: pointer;
+        margin-right: 1vw;
+        font-size: 2vw;
+      }
+
+      .suggestion:hover {
+        background-color: var(--color2); /* Changed to purple */
+        color: white;
+      }
+
+      .suggestionsContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0vw;
+        align-items: center;
+        text-align: center;
+      }
+
+      #instructions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0.2vw;
+        font-size: 1.5vw;
+      }
+
+      #instructions p {
+        max-width: 100%;
+      }
+
+      @media (min-width: 1200px) {
+        body {
+          padding-left: 15%;
+          padding-right: 15%;
+        }
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 2vw;
+        font-size: 3vw;
+      }
+
+      /* Rest of your CSS styles... */
+
+      @media (min-width: 1200px) {
+        body {
+          padding: 2rem;
+          font-size: 1.6rem; /* 16px base font size for desktops */
+        }
+
+        /* Adjust sizes for other elements as needed... */
+
+        h1 {
+          font-size: 2rem; /* 20px for desktops */
+        }
+
+        .botText,
+        .userText,
+        .inputBox,
+        .inputButton,
+        .errorText {
+          font-size: 1.2rem; /* 12px for desktops */
+        }
+
+        .suggestion {
+          padding: 1rem 1rem;
+          font-size: 1.1rem; /* 12px for desktops */
+        }
+
+        #instructions {
+          padding: 1rem;
+          font-size: 1rem; /* 12px for desktops */
+        }
+      }
+      @media (min-width: 1200px) {
+        body {
+          padding-left: 15%;
+          padding-right: 15%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1></h1>
+    <div id="cbox">
+      <div id="chatbox">
+        <p id="botStarterMessage" class="botText">
+          <span> </span>
+        </p>
+      </div>
+    </div>
+    <div id="userInput">
+      <input type="hidden" id="botName" name="botName" />
+      <input
+        id="textInput"
+        class="inputBox"
+        placeholder="Type your message here..."
+        type="text"
+      />
+      <button id="buttonInput" class="inputButton" onclick="sendMessage()">
+        Send
+      </button>
+    </div>
+    <div id="instructions">
+      <p>
+        Type a message above and click "Send" then wait for a response. Or
+        instead of typing you can click on a suggestion below:
+      </p>
+    </div>
+
+    <div id="userInputSuggestions">
+      <div id="suggestionsContainer"></div>
+    </div>
+    <script>
+      // Add event listener for Enter key press
+      document
+        .querySelector("#textInput")
+        .addEventListener("keyup", function (event) {
+          if (event.keyCode === 13) {
+            event.preventDefault();
+            sendMessage();
+          }
+        });
+
+      async function sendMessage() {
+        const messageBox = document.querySelector("#textInput");
+        const message = messageBox.value;
+        messageBox.value = "";
+
+        // Add user message to the chat
+        document.querySelector(
+          "#chatbox"
+        ).innerHTML += `<p class="userText"><span>${message}</span></p>`;
+
+        // Display loading spinner
+        document.querySelector(
+          "#chatbox"
+        ).innerHTML += `<div class="loadingIndicator"></div>`;
+        scrollToBottom();
+        try {
+          const previousMessages = Array.from(
+            document.querySelectorAll(".userText, .botText")
+          ).map((element) => ({
+            role: element.classList.contains("userText") ? "user" : "assistant",
+            content: element.textContent.trim(),
+          }));
+
+          const response = await fetch("/message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: previousMessages,
+              botName: botName,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to get response from the server.");
+          }
+
+          const jsonResponse = await response.json();
+          const botMessage = jsonResponse.reply;
+
+          // Remove loading spinner
+          document.querySelector(".loadingIndicator").remove();
+          var botmsg = addLineBreaks(botMessage);
+          // Add bot reply to the chat
+          document.querySelector(
+            "#chatbox"
+          ).innerHTML += `<p class="botText"  onclick="copyToClipboard(this)" title="Click to copy"><span>${botmsg}</span></p>`;
+        } catch (error) {
+          // Remove loading spinner
+          document.querySelector(".loadingIndicator").remove();
+
+          // Add error message to the chat
+          document.querySelector(
+            "#chatbox"
+          ).innerHTML += `<p class="errorText"><span>Failed to get response. Please try again.</span></p>`;
+          console.error(error);
+        }
+        scrollToBottom();
+      }
+      // Get the chatbox container element
+      const chatbox = document.querySelector("#chatbox");
+
+      // Function to scroll the chatbox to the bottom
+      function scrollToBottom() {
+        chatbox.scrollTop = chatbox.scrollHeight;
+      }
+      // Function to copy text to clipboard
+      function copyToClipboard(element) {
+        const text = element.textContent;
+        navigator.clipboard.writeText(text);
+        element.classList.add("copied");
+        setTimeout(() => {
+          element.classList.remove("copied");
+        }, 1000);
+      }
+      function addLineBreaks(text) {
+        return text.replace(/\n/g, "<br>\n");
+      }
+      const summerTips = [
+        "Happy summer, and remember Thorsten's Sunscreen Tip: Use a spectrophotometer to measure the UV absorption of your sunscreen. Ensure that the product blocks out a balanced proportion of both UVA (315-400 nm wavelength) and UVB (280-315 nm wavelength) light for maximum protection. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Grilling Tip: For optimal grilling results, calculate the thermal conductivity of your grill's metal grates. High conductivity metals like copper can provide even heat distribution and avoid those annoying hot spots on your grill. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Travel Tip: Try using custom 3D printed luggage to maximize packing efficiency. Using a scan of all your travel items, generate a perfect puzzle fit into a carry-on that adheres to airline size regulations. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Mosquito Tip: Experiment with homemade mosquito repellents by using different combinations of essential oils. Consider an optimal blend of thyme oil (at 0.1% concentration) and geraniol (2% concentration) for high efficacy. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Hydration Tip: Maintain hydration by analyzing your sweat rate. Weigh yourself before and after a workout, and drink 16-24 ounces of water for every pound lost. For precision, consider an isotonic drink adjusted to your individual mineral loss. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Footwear Tip: Use orthopedic insoles made from memory foam infused with phase-change materials. These materials absorb, store, and release heat, thereby keeping your feet at an optimal temperature. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Allergies Tip: Use a scientific air sampler to analyze pollen count in your house. Based on the findings, create a customized home ventilation plan to reduce pollen exposure during high-count days. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Sleep Tip: Use an EEG headset to monitor your brainwave patterns while sleeping. Based on the data, experiment with different bedroom temperature settings and sleeping positions to optimize your REM sleep. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Fitness Tip: Use a wearable lactic acid monitor during your workouts. Aim to stay below your lactate threshold to extend your endurance while training. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Garden Tip: Adjust your watering schedule based on your garden's evapotranspiration rate - the combination of evaporation from the soil and transpiration by plants. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Cooling Tip: Install an evapotranspiration cooling system in your house. This natural cooling method, inspired by the way plants cool themselves, can reduce indoor temperatures without using refrigerants. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Ice Cream Tip: Try using a thermoelectric spoon to keep your ice cream from melting too fast. The spoon absorbs heat from the ice cream, extending your dessert's lifespan. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Picnic Tip: Use an ultrasonic pest repeller at your picnic spot. Emitting high frequency sounds that pests detest, you can enjoy your outdoor meal in peace. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Swimming Tip: To improve your freestyle stroke, consider a metronome set to a specific stroke rate. Matching your stroke rhythm to the metronome can improve your swimming efficiency. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Surfing Tip: Use a hydrodynamic surfboard fin, designed based on the principles of fluid mechanics, for optimal speed and control while riding the waves. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Sailing Tip: Use a weather routing software to plan your sailing routes based on current wind patterns and wave heights. This can significantly reduce sailing time and increase safety. It can save you a <i>lot</i> of headache!",
+        "Happy summer, and remember Thorsten's Camping Tip: Invest in an infrared thermal camera to check for heat loss in your tent. By identifying and fixing the 'cold spots,' you can have a cozy sleep outdoors. It can save you a <i>lot</i> of headache!",
+      ];
+
+      function replaceTipPlaceholder(text) {
+        const randomTipIndex = Math.floor(Math.random() * summerTips.length);
+        const randomTip = summerTips[randomTipIndex];
+        return text.replace(
+          "[[tip]]",
+          randomTip
+          //'<span class="small-text">' + randomTip + "</span>"
+        );
+      }
+      // Get bot name from URL
+      const url = new URL(window.location.href);
+      const botName = url.pathname.slice(1); // Remove leading '/'
+      window.onload = function () {
+        // Load bot data
+        fetch(`/retrieveBotData/${botName}`)
+          .then((response) => response.json())
+          .then((data) => {
+            // Set bot data in form
+            document.getElementById("botName").value = data.data.botName;
+            document.title = data.data.pageTitle;
+
+            const titleElement = document.querySelector("h1");
+            titleElement.textContent = data.data.pageTitle;
+            const initialMessageElement = document.querySelector(
+              "#botStarterMessage span"
+            );
+            var msg1 = addLineBreaks(data.data.firstMessage);
+            msg1 = replaceTipPlaceholder(msg1);
+            initialMessageElement.innerHTML = msg1;
+            // Assuming colorScheme is a string with 3 comma-separated hex colors
+            const colors = data.data.colorScheme.split(",");
+            if (colors.length === 3) {
+              document.documentElement.style.setProperty("--color1", colors[0]);
+              document.documentElement.style.setProperty("--color2", colors[1]);
+              document.documentElement.style.setProperty("--color3", colors[2]);
+            }
+            // Set suggestions
+            const suggestionsContainer = document.getElementById(
+              "suggestionsContainer"
+            );
+            suggestionsContainer.innerHTML = ""; // Clear any existing suggestions
+            const suggestions = data.data.suggestionText.split(",");
+            suggestions.forEach((suggestion) => {
+              const button = document.createElement("button");
+              button.innerText = suggestion.trim(); // Remove leading/trailing whitespace
+              button.className = "suggestion";
+              suggestionsContainer.appendChild(button);
+            });
+            const suggestionButtons = document.querySelectorAll(".suggestion");
+            const chatInput = document.querySelector("#textInput");
+
+            suggestionButtons.forEach((button) => {
+              button.addEventListener("click", (event) => {
+                const suggestionText = event.target.textContent;
+                chatInput.value = suggestionText;
+                sendMessage();
+              });
+            });
+          })
+          .catch((error) => {
+            console.log("Error:", error);
+          });
+      };
+      async function fetchBotData(botName) {
+        const response = await fetch(`/getBotData/${botName}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+      }
+    </script>
+  </body>
+</html>
