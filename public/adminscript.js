@@ -33,7 +33,7 @@ document
 
 function loadBotData() {
   const botName = document.getElementById("bot-selector").value;
-  fetch(`/retrieveBotData/${botName}`)
+  fetch(`/getBotData/${botName}`)
     .then((response) => response.json())
     .then((data) => {
       document.getElementById("bot-name").value = data.data.botName;

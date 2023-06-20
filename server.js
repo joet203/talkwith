@@ -46,7 +46,7 @@ app.post("/storeBotData", (req, res) => {
 });
 
 // Endpoint to retrieve bot data
-app.get("/retrieveBotData/:botName", (req, res) => {
+app.get("/getBotData/:botName", (req, res) => {
   const botName = req.params.botName;
   const filename = `${dirPath}/${botName
     .replace(/[^a-z0-9]/gi, "_")
