@@ -7,6 +7,21 @@
       type="image/x-icon"
     />
     <style>
+      #progressCheckbox {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #aaa;
+        background: linear-gradient(
+          to right,
+          #1a1a1a 0%,
+          #1a1a1a 0%,
+          #6f9ceb 0%,
+          #6f9ceb 100%
+        );
+        background-size: 100% 100%;
+        transition: background 0.5s;
+        cursor: pointer;
+      }
       body {
         --color0: #fff;
         --color1: #000; // default color
@@ -223,6 +238,8 @@
     </style>
   </head>
   <body>
+  
+
     <h1></h1>
     <div id="cbox">
       <div id="chatbox">
@@ -243,6 +260,7 @@
         Send
       </button>
     </div>
+    <div id="bot-selector"></div>
     <div id="instructions">
       <p>
         Type a message above and click "Send" then wait for a response. Or
@@ -322,6 +340,70 @@
         }
         scrollToBottom();
       }
+
+      async function sendMessageBack(bot) {
+        // const messageBox = document.querySelector("#textInput");
+        //         const message = messageBox.value;
+        //         messageBox.value = "";
+
+        //         // Add user message to the chat
+        //         document.querySelector(
+        //           "#chatbox"
+        //         ).innerHTML += `<p class="userText"><span>${message}</span></p>`;
+
+        // Display loading spinner
+        document.querySelector(
+          "#chatbox"
+        ).innerHTML += `<div class="loadingIndicator bac"></div>`;
+        scrollToBottom();
+        try {
+          const previousMessages = Array.from(
+            document.querySelectorAll(".userText, .botText")
+          ).map((element) => ({
+            role: element.classList.contains("userText") ? "assistant" : "user",
+            content: element.textContent.trim(),
+          }));
+
+          const response = await fetch("/message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: previousMessages,
+              botName: bot,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to get response from the server.");
+          }
+
+          const jsonResponse = await response.json();
+          const botMessage = jsonResponse.reply;
+
+          // Remove loading spinner
+          document.querySelector(".loadingIndicator").remove();
+          var botmsg = addLineBreaks(botMessage);
+          // Add bot reply to the chat as user
+
+          const messageBox = document.querySelector("#textInput");
+          messageBox.value = botMessage;
+          sendMessage();
+          // document.querySelector(
+          //   "#chatbox"
+          // ).innerHTML += `<p class="userText"><span>${botMessage}</span></p>`;
+        } catch (error) {
+          // Remove loading spinner
+          //document.querySelector(".loadingIndicator").remove();
+
+          // Add error message to the chat
+          document.querySelector(
+            "#chatbox"
+          ).innerHTML += `<p class="errorText"><span>Failed to get a response.. Please try again.</span></p>`;
+          console.log(error);
+        }
+        scrollToBottom();
+      }
+
       // Get the chatbox container element
       const chatbox = document.querySelector("#chatbox");
 
@@ -375,7 +457,7 @@
       const botName = url.pathname.slice(1); // Remove leading '/'
       window.onload = function () {
         // Load bot data
-        fetch(`/retrieveBotData/${botName}`)
+        fetch(`/getBotData/${botName}`)
           .then((response) => response.json())
           .then((data) => {
             // Set bot data in form
@@ -423,6 +505,20 @@
           .catch((error) => {
             console.log("Error:", error);
           });
+        fetch("/getBotNames")
+          .then((response) => response.json())
+          .then((data) => {
+            const div = document.getElementById("bot-selector"); // Assuming this is a div
+            data.forEach((botName) => {
+              const button = document.createElement("button");
+              button.value = botName;
+              button.textContent = botName;
+              button.onclick = function () {
+                sendMessageBack(botName);
+              };
+              div.appendChild(button);
+            });
+          });
       };
       async function fetchBotData(botName) {
         const response = await fetch(`/getBotData/${botName}`);
@@ -431,6 +527,7 @@
         }
         return await response.json();
       }
+      let progress = 0;
     </script>
   </body>
 </html>
